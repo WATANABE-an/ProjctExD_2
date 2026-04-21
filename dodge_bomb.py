@@ -17,6 +17,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
+    画面内からはみ出ていないかを判定する関数
     引数：こうかとんrect、ばくだんrect
     戻り値：横方向、縦方向判定（true：画面内 false：画面外）
     """
@@ -30,17 +31,19 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
 def get_kk_imgs(base_img: pg.Surface) -> dict[tuple[int, int], pg.Surface]:
     """
     移動量タプルと対応するこうかとん画像の辞書を返す関数
+    引数：こうかとんの基本画像
+    戻り値：移動量タプルと対応する画像の辞書
     """
     kk_dict = {
-        (0, 0): pg.transform.rotozoom(base_img, 0, 1.0),
-        (0, -5): pg.transform.rotozoom(base_img, 90, 1.0),
-        (0, +5): pg.transform.rotozoom(base_img, 270, 1.0),
-        (-5, 0): pg.transform.rotozoom(base_img, 180, 1.0),
-        (+5, 0): pg.transform.rotozoom(base_img, 0, 1.0),
-        (-5, -5): pg.transform.rotozoom(base_img, 135, 1.0),
-        (+5, -5): pg.transform.rotozoom(base_img, 45, 1.0),
-        (-5, +5): pg.transform.rotozoom(base_img, 225, 1.0),
-        (+5, +5): pg.transform.rotozoom(base_img, 315, 1.0),
+        (0, 0): pg.transform.rotozoom(base_img, 0, 1.0),     #移動なし
+        (0, -5): pg.transform.rotozoom(base_img, 90, 1.0),   #上移動
+        (0, +5): pg.transform.rotozoom(base_img, 270, 1.0),  #下移動
+        (-5, 0): pg.transform.rotozoom(base_img, 180, 1.0),  #左移動
+        (+5, 0): pg.transform.rotozoom(base_img, 0, 1.0),    #右移動
+        (-5, -5): pg.transform.rotozoom(base_img, 135, 1.0), #左上移動
+        (+5, -5): pg.transform.rotozoom(base_img, 45, 1.0),  #右上移動
+        (-5, +5): pg.transform.rotozoom(base_img, 225, 1.0), #左下移動
+        (+5, +5): pg.transform.rotozoom(base_img, 315, 1.0), #右下移動
     }
     return kk_dict
 
@@ -90,7 +93,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        if kk_rct.colliderect(bb_rct):
+        if kk_rct.colliderect(bb_rct): #ゲームオーバー処理
             gameover(screen)
             return
 
@@ -98,7 +101,7 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        for key, mv in DELTA.items():
+        for key, mv in DELTA.items():#こうかとんの移動
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
@@ -107,7 +110,7 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
+        bb_rct.move_ip(vx, vy) #爆弾の移動
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
