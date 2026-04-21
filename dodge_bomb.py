@@ -1,6 +1,7 @@
 import os
 import sys
 import random
+import time
 import pygame as pg
 
 
@@ -25,7 +26,27 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     if rct.top < 0 or HEIGHT < rct.bottom: #縦判定
         tate = False
     return yoko, tate
-    
+
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    ゲームオーバーを表示する関数
+    引数：surface
+    戻り値：なし
+    """
+    bk_img = pg.Surface((WIDTH, HEIGHT))
+    bk_img.set_colorkey((20, 20, 20))
+    bk_img.set_alpha(200)
+    fonto = pg.font.Font(None, 80)
+    txt = fonto.render("GAME OVER", True, (255, 255, 255))
+    gm_img = pg.image.load("fig/8.png")
+    bk_img.blit(txt, [350, 250])
+    bk_img.blit(gm_img, [300, 250])
+    bk_img.blit(gm_img, [700, 250])
+    screen.blit(bk_img, [0, 0])
+    pg.display.update()
+    time.sleep(5)
+    return bk_img
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -50,19 +71,13 @@ def main():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bb_rct):
-            return #ゲームオーバー
+            gameover(screen)
+            return
+
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
-        #if key_lst[pg.K_UP]:
-            #sum_mv[1] -= 5
-        #if key_lst[pg.K_DOWN]:
-            #sum_mv[1] += 5
-        #if key_lst[pg.K_LEFT]:
-            #sum_mv[0] -= 5
-        #if key_lst[pg.K_RIGHT]:
-            #sum_mv[0] += 5
         for key, mv in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
